@@ -1,0 +1,10 @@
+- Decide between C + GLIB against C++ + Boost
+- Choose make tool to use (cmake?) and create the skeleton makefile for the project
+- Create the main program
+- Make main program run as a daemon
+- Make main program read configuration files, preferably in [yaml, http://www.yaml.org/]
+- Make main program listen to a port and attend requests
+- Choose between Threads or Process + IPC. It's imperative that seg faults on business units don't crash the server
+- Implement the multiple thread system and make it answer to requests
+- Build a file od BD queue system
+- Create an administration interface that communicates to the server and change the application files. Most likely the admin interface and any web part of the app server will be a ruby on rails app
