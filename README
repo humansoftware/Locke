@@ -10,7 +10,7 @@ The main reason many programmers and architects choose to use Java is the availa
 - You deploy this compiled piece of code, which made use of a JEE API onto your Application Server, a product that follows the JEE specification.
 - Your piece of code turns available to be called as a service (RMI, SOAP, CORBA, REST, etc.) and has a lot of tunning parameters configurable by the Application Server administration interface. All the infrastructure needed to run and make available your piece of code is provided by the app server. 
 
-The idea of Locke is doing the same thing described above, but using C. By using a fully compiled solution, but as simple to use as JEE, you get the best of two worlds: c performance, flexibility and interoperability, joined with a easy to use yet powerful and pre-tested platform that turns your application Robust.
+The idea of Locke is doing the same thing described above, but using C. By using a fully compiled solution, but as simple to use as JEE, you get the best of two worlds: c performance, flexibility and interoperability, joined with a easy to use yet powerful and pre-tested platform that makes your application being Robust.
 
 Locke is in planning phase.
 
