@@ -1,0 +1,16 @@
+Locke is a C Application Server intended for scalable business rules processing.
+The name of the project was an ode to [John Locke, http://en.wikipedia.org/wiki/John_Locke].
+
+--------------------------
+Introduction
+--------------------------
+Java developers have several tools at their disposal to write business rules components, like Session EJBs (Enterprise Java Beans) and MDBs (Message Driven Beans), as specified in Java Enterprise Edition (JEE) specification.
+The main reason many programmers and architects choose to use Java is the availability of such tools. These is how it works in JEE world:
+- You write a piece of code (EJB)  that contains only your specific business rules, database and legacy systems access.  You must do it by following the specification.
+- You deploy this compiled piece of code, which made use of a JEE API onto your Application Server, a product that follows the JEE specification.
+- Your piece of code turns available to be called as a service (RMI, SOAP, CORBA, REST, etc.) and has a lot of tunning parameters configurable by the Application Server administration interface. All the infrastructure needed to run and make available your piece of code is provided by the app server. 
+
+The idea of Locke is doing the same thing described above, but using C. By using a fully compiled solution, but as simple to use as JEE, you get the best of two worlds: c performance, flexibility and interoperability, joined with a easy to use yet powerful and pre-tested platform that turns your application Robust.
+
+Locke is in planning phase.
+
