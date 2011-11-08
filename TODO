@@ -1,5 +1,5 @@
-- Decide between C + GLIB against C++ + Boost
-- Choose make tool to use (cmake?) and create the skeleton makefile for the project
+/- Decide between C + GLIB against C++ + Boost  - decided - C + glib2.0
+- Replace current make files by some make tool like cmake or autoconf
 - Create the main program
 - Make main program run as a daemon
 - Make main program read configuration files, preferably in [yaml, http://www.yaml.org/]
