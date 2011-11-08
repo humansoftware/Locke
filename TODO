@@ -8,3 +8,5 @@
 - Implement the multiple thread system and make it answer to requests
 - Build a file od BD queue system
 - Create an administration interface that communicates to the server and change the application files. Most likely the admin interface and any web part of the app server will be a ruby on rails app
+- Implement doc generation by using doxygen
+- Create a new library or use an existent one for database access. It's important that the connection pool parameters and connection data need to be configured by the admin interface.
