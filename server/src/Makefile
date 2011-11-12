@@ -9,7 +9,7 @@ LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS)
 
 CC=gcc
 PROGNAME=locke
-OBJS=main.o
+OBJS=main.o locke.o
 
 all: $(OBJS)
 	$(CC) $(OBJS) -o $(PROGNAME) $(LDFLAGS)

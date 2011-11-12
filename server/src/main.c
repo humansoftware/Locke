@@ -1,39 +1,45 @@
 #include <stdio.h>
-#include <signal.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <glib-object.h>
 #include <signal.h>
 
-void print_t();
-void trata_sigsev(int signum);
+#include <locke.h>
+
+/* The program main loop */
+GMainLoop *loop;
+
+static void signals_handler(int signum) {
+	printf(" Signal %d detected!! \n ", signum);
+	if (loop && g_main_loop_is_running(loop)) {
+		g_main_loop_quit(loop);
+	}
+}
 
 int main() {
-	//g_unix_signal_add(SIGSEV, trata_sigsev, NULL);
-	signal(SIGSEGV, trata_sigsev);
-	g_thread_init(NULL);
-	g_thread_create(print_t, 0, FALSE, NULL);
-	while(1) {
-	printf("Hello Locke\n");
-	g_print("Hello glib\n");
-	sleep(5);
-	puts("aki");
-	}
+	/* Setup program signals */
+	signal(SIGINT, signals_handler);
+	signal(SIGHUP, signals_handler);
+	signal(SIGTERM, signals_handler);
+
+	g_print("Locke server v%d.%d\n", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
+	g_print("Starting glib backend\n");
+	/* Initialize GLib type system */
+	g_type_init();
+
+	g_print("Creating main loop\n");
+	/* Create the main loop */
+	loop = g_main_loop_new(NULL, FALSE);
+
+	// add source to default context
+	g_timeout_add (1000, timeout_callback , loop);
+
+	/* Run the mais loop */
+	g_main_loop_run(loop);
+	g_main_loop_unref (loop);
+
+	g_print("Main loop is over. Goodbye! \n");
 	return 0;
 }
 
-void print_t()
-{
-	char *buffer;
-	printf("hello threads\n");
-	buffer[5] = '\0';
-}
 
-void trata_sigsev(int signum)
-{
-	printf("Process %d got signal %d\n", getpid(), signum);
-	puts("pegei o sinal maldito");
-	signal(signum, SIG_DFL);
-	//exit(1);
-}
