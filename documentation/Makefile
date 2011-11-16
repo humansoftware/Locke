@@ -2,7 +2,7 @@
 DOXYGEN=doxygen
 
 all:
-	$(DOXYGEN) DoxyFile
+	$(DOXYGEN) Doxyfile
 
 clean:
 	rm -fr doxy

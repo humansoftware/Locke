@@ -1,19 +1,25 @@
 
+#The include dir reffers to the folder with header files that will be included by applications too
+INCLUDE_DIR=../include
+
 GLIB_FLAGS=$$(pkg-config --cflags glib-2.0) 
 GIO_FLAGS=$$(pkg-config --cflags gio-2.0)
-CFLAGS=-g -Wall -O2 -I. $(GLIB_FLAGS) $(GIO_FLAGS)
+GMODULE_FLAGS=$$(pkg-config --cflags gmodule-2.0)
+CFLAGS=-g -Wall -O2 -I. -I$(INCLUDE_DIR) $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS)
 
 GLIB_LIBS=$$(pkg-config --libs glib-2.0) 
 GIO_LIBS=$$(pkg-config --libs gio-2.0)
-LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS)
+GMODULE_LIBS=$$(pkg-config --libs gmodule-2.0)
+LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS)
 
 CC=gcc
 PROGNAME=locke
 OBJS=main.o locke.o
 
+
 all: $(OBJS)
 	$(CC) $(OBJS) -o $(PROGNAME) $(LDFLAGS)
 
 clean:
-	rm -f *.o $(PROGNAME)
+	rm -f *.o $(PROGNAME)	
 

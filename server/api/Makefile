@@ -1,0 +1,28 @@
+
+GLIB_FLAGS=$$(pkg-config --cflags glib-2.0) 
+GIO_FLAGS=$$(pkg-config --cflags gio-2.0)
+GMODULE_FLAGS=$$(pkg-config --cflags gmodule-2.0)
+CFLAGS=-g -Wall -O2 -fPIC -I. $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS)
+
+GLIB_LIBS=$$(pkg-config --libs glib-2.0) 
+GIO_LIBS=$$(pkg-config --libs gio-2.0)
+GMODULE_LIBS=$$(pkg-config --libs gmodule-2.0)
+LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS) 
+
+CC=gcc
+PROGNAME=lockeapi
+#include the default implementation
+OBJS=locke_api_posix.o
+
+all: $(OBJS)
+	$(CC) -shared -Wl,-soname,lib$(PROGNAME).so -o lib$(PROGNAME).so $(OBJS) $(LDFLAGS) 
+
+test: clean all test.o
+	$(CC) test.o -o test -L. -l$(PROGNAME)
+run_test: test
+	export LD_LIBRARY_PATH=. && ./test
+
+clean:
+	rm -f *.o lib$(PROGNAME).so*	
+	rm -f test
+

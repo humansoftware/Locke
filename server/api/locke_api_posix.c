@@ -1,0 +1,14 @@
+/**
+ * \file locke_api.c
+ *
+ *  Created on: 16/11/2011
+ *      Author: mvalle
+ *
+ *  \brief This file should be the POSIX implementation of the Locke API.
+ *  The POSIX implementation should make use of the POSIX IPC messages to communicate to the Locke
+ *  main process.
+ *
+ */
+
+
+

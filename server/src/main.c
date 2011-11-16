@@ -21,6 +21,7 @@ int main() {
 	signal(SIGINT, signals_handler);
 	signal(SIGHUP, signals_handler);
 	signal(SIGTERM, signals_handler);
+	signal(SIGSEGV, signals_handler);
 
 	g_print("Locke server v%d.%d\n", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
 	g_print("Starting glib backend\n");

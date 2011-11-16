@@ -1,8 +1,12 @@
-/*
- * locke.c
+/**
+ * \file locke.c
  *
  *  Created on: 10/11/2011
  *      Author: Marcelo Elias Del Valle
+ *
+ *  \brief Application Server main file.
+ *  This file includes the main function and corresponds to the app server itself.
+ *
  */
 #include <locke.h>
 
