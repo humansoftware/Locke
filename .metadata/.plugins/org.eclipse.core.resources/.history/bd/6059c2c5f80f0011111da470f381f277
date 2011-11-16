@@ -1,0 +1,16 @@
+/** \file locke_application.h
+ *
+ *  Created on: 16/11/2011
+ *      Author: mvalle
+ *
+ *	\brief This class is responsible for all methods associated with a loaded application.
+ *	All events generated to the application should be sent by using the methods of this class.
+ *
+ */
+
+#ifndef LOCKE_APPLICATION_H_
+#define LOCKE_APPLICATION_H_
+
+
+
+#endif /* LOCKE_APPLICATION_H_ */

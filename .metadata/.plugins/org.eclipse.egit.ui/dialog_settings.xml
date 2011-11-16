@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="true" key="CommitDialog.showUntracked"/>
+	<list key="CommitDialog.authorValues">
+		<item value="Marcelo Elias Del Valle &lt;mvallebr@gmail.com&gt;"/>
+	</list>
+	<list key="CommitDialog.committerValues">
+		<item value="Marcelo Elias Del Valle &lt;mvallebr@gmail.com&gt;"/>
+	</list>
+	<list key="RepositorySelectionPage.UsedUris">
+		<item value="git@github.com:humansoftware/Locke.git"/>
+	</list>
+	<section name="GitCommitMessageComponent">
+	</section>
+</section>

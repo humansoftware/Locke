@@ -1,0 +1,15 @@
+/*
+ * appmanager.h
+ *
+ *  Created on: 16/11/2011
+ *      Author: mvalle
+ */
+
+#ifndef APPMANAGER_H_
+#define APPMANAGER_H_
+
+#include <application.h>
+
+
+
+#endif /* APPMANAGER_H_ */

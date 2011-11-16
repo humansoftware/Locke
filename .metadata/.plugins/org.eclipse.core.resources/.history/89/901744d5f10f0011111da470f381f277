@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo first: $1
+for (x=2; x<$#; x++)
+do
+    echo $x
+done
+echo others: $@

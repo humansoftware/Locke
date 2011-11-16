@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export LD_LIBRARY_PATH=./api/
 #nohup 
 ./locke &
 LASTPID=$!

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+nohup ./locke &
+LASTPID=$!
+echo "PID = ${LASTPID}"

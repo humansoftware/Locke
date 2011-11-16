@@ -1,0 +1,15 @@
+/** \file locke_api.h
+ *
+ *  Created on: 16/11/2011
+ *      Author: mvalle
+ *
+ *	\brief This file should contain an api definition
+ *
+ */
+
+#ifndef LOCKE_API_H_
+#define LOCKE_API_H_
+
+
+
+#endif /* LOCKE_API_H_ */

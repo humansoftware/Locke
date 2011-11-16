@@ -1,0 +1,16 @@
+
+CC=gcc
+CFLAGS=-Wall -O2 $(pkg-config --cflags glib-2.0)
+LDFLAGS=$(pkg-config --libs glib-2.0) 
+APPLIST=demo001 demo002
+
+all:
+	for x in $(APPLIST)
+	do
+		cd demo001 && make all
+	done
+
+clean:
+	cd demo001 && make clean
+	rm -fr $(DIST_DIR)
+	

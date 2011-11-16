@@ -1,0 +1,18 @@
+/** \file locke_api.h
+ *
+ *  Created on: 16/11/2011
+ *      Author: mvalle
+ *
+ *	\brief This file should contain an api definition to be used by Locke applications.
+ *	Every application should make use of this api to send messages to the Locke process and
+ *	problably Locke itself should know this interface, as it should provide an implementation
+ *	for it, even if it is not a direct implementation.
+ *
+ */
+
+#ifndef LOCKE_API_H_
+#define LOCKE_API_H_
+
+
+
+#endif /* LOCKE_API_H_ */

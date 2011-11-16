@@ -1,0 +1,17 @@
+/** \file locke_appmanager.h
+ *
+ *  \brief Created on: 16/11/2011
+ *      Author: mvalle
+ *
+ *	This class is responsible for
+ *
+ *
+ */
+
+
+#ifndef LOCKE_APPMANAGER_H_
+#define LOCKE_APPMANAGER_H_
+
+
+
+#endif /* LOCKE_APPMANAGER_H_ */

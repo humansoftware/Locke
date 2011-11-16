@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo first: $1
+for x in 2...$#
+echo others: $@

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+nohup ./locke &
+LASTPID=$!
+echo "Process created, PID = ${LASTPID}"

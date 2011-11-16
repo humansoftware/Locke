@@ -1,0 +1,29 @@
+
+**** Clean-only build of configuration Default for project Locke ****
+
+****  WARNING: The "Default" Configuration may not build  ****
+****  because it uses the "cdt.managedbuild.toolchain.gnu.cygwin.base"  ****
+****  tool-chain that is unsupported on this system.  ****
+
+****  Attempting to build...  **** 
+
+make clean 
+cd server && make clean
+make[1]: Entrando no diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server'
+cd api && make clean
+make[2]: Entrando no diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server/api'
+rm -f *.o liblockeapi.so*	
+rm -f test
+make[2]: Saindo do diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server/api'
+cd src && make clean
+make[2]: Entrando no diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server/src'
+rm -f *.o locke	
+make[2]: Saindo do diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server/src'
+rm -fr ../dist
+make[1]: Saindo do diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/server'
+cd documentation && make clean
+make[1]: Entrando no diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/documentation'
+rm -fr doxy
+make[1]: Saindo do diretório `/home/mvalle/Dropbox/workspaces/ws_c/Locke/documentation'
+
+**** Build Finished ****

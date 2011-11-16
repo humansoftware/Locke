@@ -1,0 +1,9 @@
+
+
+all:
+	cd demo001 && make all
+
+clean:
+	cd demo001 && make clean
+	rm -fr $(DIST_DIR)
+	

@@ -1,23 +1,17 @@
+include ../../common.makefile
 
 #The include dir reffers to the folder with header files that will be included by applications too
-INCLUDE_DIR=../include
+API_DIR=../api
 
-GLIB_FLAGS=$$(pkg-config --cflags glib-2.0) 
-GIO_FLAGS=$$(pkg-config --cflags gio-2.0)
-GMODULE_FLAGS=$$(pkg-config --cflags gmodule-2.0)
-CFLAGS=-g -Wall -O2 -I. -I$(INCLUDE_DIR) $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS)
-
-GLIB_LIBS=$$(pkg-config --libs glib-2.0) 
-GIO_LIBS=$$(pkg-config --libs gio-2.0)
-GMODULE_LIBS=$$(pkg-config --libs gmodule-2.0)
+CFLAGS=-g -Wall -O2 -I. -I$(API_DIR) $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS)
 LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS)
 
-CC=gcc
 PROGNAME=locke
-OBJS=main.o locke.o
+OBJS=locke.o locke_appmanager.o \
+	locke_application.o
 
-
-all: $(OBJS)
+all: $(OBJS)	
+	echo $(GLIB_LIBS)
 	$(CC) $(OBJS) -o $(PROGNAME) $(LDFLAGS)
 
 clean:
