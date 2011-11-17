@@ -13,7 +13,18 @@
 
 #ifndef LOCKE_APPMANAGER_H_
 #define LOCKE_APPMANAGER_H_
+#include <glib.h>
+#include <locke_application.h>
 
+typedef struct _LockeAppManager {
+	gchar deployFolder[1024];
+} LockeAppManager;
+
+LockeAppManager *locke_appmanager_new();
+void locke_appmanager_init(LockeAppManager *lam, gchar *folder);
 
 
 #endif /* LOCKE_APPMANAGER_H_ */
+
+
+

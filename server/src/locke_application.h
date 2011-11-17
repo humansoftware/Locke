@@ -13,6 +13,9 @@
 #ifndef LOCKE_APPLICATION_H_
 #define LOCKE_APPLICATION_H_
 
+typedef struct _LockeApplication {
+	int b;
+} LockeApplication;
 
 
 #endif /* LOCKE_APPLICATION_H_ */

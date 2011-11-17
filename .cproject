@@ -32,7 +32,9 @@
 							<builder errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="cdt.managedbuild.target.gnu.builder.cygwin.base.1236325515" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.cygwin.base"/>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.cygwin.base.797775115" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.base">
 								<option id="gnu.both.asm.option.include.paths.399512301" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${GLIB_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${GLIB_ROOT}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/asm-generic"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1498270395" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -40,9 +42,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base.966688482" name="Cygwin C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.1528078217" name="Cygwin C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base">
 								<option id="gnu.c.compiler.option.include.paths.1564192004" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${GLIB_ROOT}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\cygwin\lib\glib-2.0\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\cygwin\usr\include\glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${GLIB_ROOT}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/include/asm-generic"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1799987515" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
 							</tool>

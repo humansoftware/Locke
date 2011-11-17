@@ -10,6 +10,7 @@
 
 #include <glib.h>
 
+
 #define LOCKE_MAJOR_VERSION 0
 #define LOCKE_MINOR_VERSION 1
 

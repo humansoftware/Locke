@@ -16,6 +16,8 @@
 #include <signal.h>
 
 #include <locke.h>
+#include <locke_system.h>
+#include <locke_appmanager.h>
 
 
 gboolean timeout_callback(gpointer data)
@@ -45,7 +47,7 @@ static void signals_handler(int signum) {
 	}
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	/* Setup program signals */
 	signal(SIGINT, signals_handler);
 	signal(SIGHUP, signals_handler);
@@ -62,7 +64,17 @@ int main() {
 	loop = g_main_loop_new(NULL, FALSE);
 
 	// add source to default context
-	g_timeout_add (1000, timeout_callback , loop);
+	// g_timeout_add (1000, timeout_callback , loop);
+
+	/* Init system */
+	LockeSystem *system = locke_system_get_singleton(argc, argv);
+
+	/* Create application manager */
+	gchar deployFolder[1024];
+	strcpy(deployFolder, system->appFolder);
+	strcat(deployFolder, "autodeploy");
+	LockeAppManager *appmanager = locke_appmanager_new();
+	locke_appmanager_init(appmanager, deployFolder);
 
 	/* Run the mais loop */
 	g_main_loop_run(loop);
