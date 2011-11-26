@@ -19,32 +19,33 @@
 #include <locke_system.h>
 #include <locke_appmanager.h>
 
+gboolean timeout_callback(gpointer data) {
+	static int i = 0;
 
-gboolean timeout_callback(gpointer data)
-{
-    static int i = 0;
+	i++;
+	g_print("timeout_callback called %d/10 times\n", i);
+	if (10 == i) {
+		g_main_loop_quit((GMainLoop*) data);
+		return FALSE;
+	}
 
-    i++;
-    g_print("timeout_callback called %d/10 times\n", i);
-    if (10 == i)
-    {
-        g_main_loop_quit( (GMainLoop*)data );
-        return FALSE;
-    }
-
-    return TRUE;
+	return TRUE;
 }
-
-
 
 /* The program main loop */
 GMainLoop *loop;
 
 static void signals_handler(int signum) {
 	printf(" Signal %d detected!! \n ", signum);
+	if (signum == SIGSEGV) {
+		fprintf(stderr,
+				" Too bad, received segmentation fault... bye bye. :( \n ");
+		exit(-1);
+	}
 	if (loop && g_main_loop_is_running(loop)) {
 		g_main_loop_quit(loop);
 	}
+
 }
 
 int main(int argc, char *argv[]) {
@@ -71,18 +72,31 @@ int main(int argc, char *argv[]) {
 
 	/* Create application manager */
 	gchar deployFolder[1024];
+
 	strcpy(deployFolder, system->appFolder);
 	strcat(deployFolder, "autodeploy");
 	LockeAppManager *appmanager = locke_appmanager_new();
-	locke_appmanager_init(appmanager, deployFolder);
 
-	/* Run the mais loop */
-	g_main_loop_run(loop);
-	g_main_loop_unref (loop);
+	GError *err = NULL;
+	locke_appmanager_set_state(appmanager, SERVER_STARTING);
+	locke_appmanager_init(appmanager, deployFolder, &err);
+	if (err != NULL) {
+		/* Report error to user, and free error */
+		fprintf(stderr, "Unable to Init application manager: %s\n",
+				err->message);
+		g_error_free(err);
+	} else {
+		locke_appmanager_set_state(appmanager, SERVER_RUNNING);
+		/* Run the main loop */
+		g_main_loop_run(loop);
+		/* main loop done*/
+		locke_appmanager_set_state(appmanager, SERVER_STOPPING);
+		g_main_loop_unref(loop);
+	}
 
-	g_print("Main loop is over. Goodbye! \n");
+	locke_appmanager_stop(appmanager);
+	locke_appmanager_destroy(appmanager);
+	locke_appmanager_set_state(appmanager, SERVER_STOPPED);
 	return 0;
 }
-
-
 

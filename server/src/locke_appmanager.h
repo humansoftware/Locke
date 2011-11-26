@@ -10,21 +10,32 @@
  *
  */
 
-
 #ifndef LOCKE_APPMANAGER_H_
 #define LOCKE_APPMANAGER_H_
 #include <glib.h>
+#include <gio/gio.h>
 #include <locke_application.h>
 
+typedef enum {
+	SERVER_STARTING = 1, SERVER_RUNNING, SERVER_STOPPING, SERVER_STOPPED
+} LockeAppManagerState;
+
 typedef struct _LockeAppManager {
-	gchar deployFolder[1024];
+	LockeAppManagerState state;
+	GHashTable * appList;
+	GFileMonitor *deployDirMonitor;
+	GFile *deployFolder;
 } LockeAppManager;
 
 LockeAppManager *locke_appmanager_new();
-void locke_appmanager_init(LockeAppManager *lam, gchar *folder);
-
+void locke_appmanager_destroy(LockeAppManager *lam);
+void locke_appmanager_init(LockeAppManager *lam, gchar *folder, GError **err);
+void locke_appmanager_stop(LockeAppManager *lam);
+void locke_appmanager_set_state(LockeAppManager *lam,
+		LockeAppManagerState state);
+void locke_appmanager_add_application(LockeAppManager *lam);
+void locke_appmanager_remove_application(LockeAppManager *lam);
+void locke_appmanager_scan_for_deploys(LockeAppManager *lam, GFile *deployDir);
 
 #endif /* LOCKE_APPMANAGER_H_ */
-
-
 
