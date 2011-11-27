@@ -17,3 +17,4 @@ typedef struct _LockeSystem {
 LockeSystem *locke_system_get_singleton(int argc, char *argv[]);
 LockeSystem *locke_system_new();
 void locke_system_init(LockeSystem *ls, int argc, char *argv[]);
+

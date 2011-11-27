@@ -5,9 +5,6 @@
  *      Author: mvalle
  */
 
-/* TODO: use gmodule to dinamically load the application
- * http://developer.gnome.org/glib/stable/glib-Dynamic-Loading-of-Modules.html
- * */
 #include <locke_appmanager.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,6 +73,8 @@ void locke_appmanager_stop(LockeAppManager *lam) {
 
 void locke_appmanager_set_state(LockeAppManager *lam,
 		LockeAppManagerState state) {
+	g_print(
+			"============================================================================\n");
 	switch (state) {
 	case SERVER_STARTING:
 		g_print("Server entered STARTING state. \n");
@@ -94,6 +93,8 @@ void locke_appmanager_set_state(LockeAppManager *lam,
 		return;
 		break;
 	}
+	g_print(
+			"============================================================================\n");
 	lam->state = state;
 }
 
@@ -101,7 +102,8 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 		GFile *child, GFile *other_file, GFileMonitorEvent event_type,
 		gpointer user_data) {
 	LockeAppManager *lam = (LockeAppManager *) user_data;
-	g_print("Something has changed at '%s'. Checking...\n",
+	g_print("\n-----------------------------------------------------\n");
+	g_print("Something has changed at '%s'. \nChecking...\n",
 			g_file_get_path(lam->deployFolder));
 	switch (event_type) {
 	case G_FILE_MONITOR_EVENT_DELETED:
@@ -109,8 +111,11 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 		if (g_file_has_parent(child, lam->deployFolder)) {
 			char *path = g_file_get_path(child);
 			g_print(
-					" I am going to try to remove the application at path '%s' \n",
+					" =========> I am going to try to remove the application at path '%s' \n",
 					path);
+			locke_appmanager_remove_application(lam,
+					g_file_get_path(lam->deployFolder),
+					g_file_get_basename(child));
 		}
 		break;
 	case G_FILE_MONITOR_EVENT_CREATED:
@@ -118,24 +123,36 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 		if (g_file_has_parent(child, lam->deployFolder)) {
 			char *path = g_file_get_path(child);
 			g_print(
-					" I am going to try to create an application for path '%s'  \n",
+					" =========> I am going to try to create an application for path '%s'  \n",
 					path);
+			locke_appmanager_add_application(lam,
+					g_file_get_path(lam->deployFolder),
+					g_file_get_basename(child));
 		}
 		break;
 	case G_FILE_MONITOR_EVENT_CHANGED:
-		g_print("'%s' started changing\n", g_file_get_basename(child));
+		/* g_print("'%s' started changing\n", g_file_get_basename(child)); */
 		break;
 	case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-		g_print("'%s' finished changing\n", g_file_get_basename(child));
+		/* g_print("'%s' finished changing\n", g_file_get_basename(child)); */
 		break;
 	case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
 		g_print("'%s' attributes changed\n", g_file_get_basename(child));
+		/* Process only directories. Files are just ignored. */
+		if (g_file_query_file_type(child, G_FILE_QUERY_INFO_NONE, NULL)
+				!= G_FILE_TYPE_DIRECTORY) {
+			break;
+		}
+		locke_appmanager_file_changed(file_monitor, child, other_file,
+				G_FILE_MONITOR_EVENT_DELETED, user_data);
+		locke_appmanager_file_changed(file_monitor, child, other_file,
+				G_FILE_MONITOR_EVENT_CREATED, user_data);
 		break;
 	default:
-		g_print("'%s' received event %d \n", g_file_get_basename(child),
-				event_type);
+		/* g_print("'%s' received event %d \n", g_file_get_basename(child),
+		 event_type);
+		 */
 		break;
-
 	}
 }
 void locke_appmanager_scan_for_deploys(LockeAppManager *lam, GFile *deployDir) {
@@ -148,5 +165,112 @@ void locke_appmanager_scan_for_deploys(LockeAppManager *lam, GFile *deployDir) {
 	}
 	g_print("Scanning folder '%s' for application deployments\n",
 			g_file_get_path(deployDir));
+
+	/* Get file enumerator */
+	GError *err = NULL;
+	GFileEnumerator *files = g_file_enumerate_children(deployDir, "*",
+			G_FILE_QUERY_INFO_NONE, NULL, &err);
+	/* TODO create a generic function that receives err as argument and do all this stuff */
+	if (err != NULL) {
+		g_print("err = %p \n", err);
+		/* Report error to user, and free error */
+		fprintf(stderr, "Unable to get file list for directory '%s': %s\n",
+				g_file_get_path(deployDir), err->message);
+		g_error_free(err);
+		goto scan_for_deploys_finally;
+	}
+
+	/* process each file individually */
+	GFileInfo *fileInfo = NULL;
+	do {
+		fileInfo = g_file_enumerator_next_file(files, NULL, &err);
+		if (err != NULL) {
+			g_print("err = %p \n", err);
+			/* Report error to user, and free error */
+			fprintf(stderr, "Unable to get file for directory '%s': %s\n",
+					g_file_get_path(deployDir), err->message);
+			g_error_free(err);
+			goto scan_for_deploys_finally;
+		}
+		/* stop condition */
+		if (fileInfo == NULL)
+			break;
+		/* finally, process the file */
+		g_print(" =========> Processing file '%s'\n",
+				g_file_info_get_display_name(fileInfo));
+		locke_appmanager_add_application(lam, g_file_get_path(deployDir),
+				g_file_info_get_name(fileInfo));
+	} while (TRUE);
+
+	/* Close open things */
+	g_file_enumerator_close(files, NULL, &err);
+	if (err != NULL) {
+		g_print("err = %p \n", err);
+		/* Report error to user, and free error */
+		fprintf(stderr,
+				"Error closing file enumerator for directory '%s': %s\n",
+				g_file_get_path(deployDir), err->message);
+		g_error_free(err);
+		goto scan_for_deploys_finally;
+	}
+	/* Free allocated memory  */
+	scan_for_deploys_finally: g_object_unref(files);
+}
+
+gboolean locke_appmanager_is_valid_application(LockeAppManager *lam,
+		const gchar *baseDir, const gchar *filename) {
+	gchar fullpath[2048];
+	gchar appfolder[2048];
+	/* calculates app folder*/
+	strcpy(appfolder, baseDir);
+	if (appfolder[strlen(baseDir) - 1] != G_DIR_SEPARATOR)
+		strcat(appfolder, G_DIR_SEPARATOR_S);
+	strcat(appfolder, filename);
+	strcat(appfolder, G_DIR_SEPARATOR_S);
+	/* check for .so existence */
+	strcpy(fullpath, appfolder);
+	strcat(fullpath, "lib");
+	strcat(fullpath, filename);
+	strcat(fullpath, ".so");
+	GFile *file = g_file_new_for_path(fullpath);
+	if (g_file_query_file_type(file, G_FILE_QUERY_INFO_NONE, NULL)
+			!= G_FILE_TYPE_REGULAR) {
+		g_print(
+				"Application path '%s' doesn't exist or is not a regular file. \nWon't try to deploy it. \n",
+				fullpath);
+		return FALSE;
+	}
+	g_object_unref(file);
+
+	/* check for .ini existence */
+	strcpy(fullpath, appfolder);
+	strcat(fullpath, filename);
+	strcat(fullpath, ".ini");
+	file = g_file_new_for_path(fullpath);
+	if (g_file_query_file_type(file, G_FILE_QUERY_INFO_NONE, NULL)
+			!= G_FILE_TYPE_REGULAR) {
+		g_print(
+				"App config file path '%s' doesn't exist or is not a regular file. \nWon't try to deploy it. \n",
+				fullpath);
+		return FALSE;
+	}
+	g_object_unref(file);
+	/* All checks completed, app is valid */
+	g_print("Application path '%s' is valid. \nWill try to deploy it. \n",
+			fullpath);
+	return TRUE;
+}
+
+void locke_appmanager_add_application(LockeAppManager *lam,
+		const gchar *baseDir, const gchar *filename) {
+	if (!locke_appmanager_is_valid_application(lam, baseDir, filename)) {
+		fprintf(stderr, "Application %s is not valid! Ignoring it! \n",
+				filename);
+		return;
+	}
+
+}
+void locke_appmanager_remove_application(LockeAppManager *lam,
+		const gchar *baseDir, const gchar *filename) {
 
 }

@@ -55,7 +55,9 @@ int main(int argc, char *argv[]) {
 	signal(SIGTERM, signals_handler);
 	signal(SIGSEGV, signals_handler);
 
+	g_print("============================================================================\n");
 	g_print("Locke server v%d.%d\n", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
+	g_print("============================================================================\n");
 	g_print("Starting glib backend\n");
 	/* Initialize GLib type system */
 	g_type_init();
@@ -64,8 +66,8 @@ int main(int argc, char *argv[]) {
 	/* Create the main loop */
 	loop = g_main_loop_new(NULL, FALSE);
 
-	// add source to default context
-	// g_timeout_add (1000, timeout_callback , loop);
+	/* add source to default context */
+	/* g_timeout_add (1000, timeout_callback , loop); */
 
 	/* Init system */
 	LockeSystem *system = locke_system_get_singleton(argc, argv);

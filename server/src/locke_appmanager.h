@@ -33,9 +33,10 @@ void locke_appmanager_init(LockeAppManager *lam, gchar *folder, GError **err);
 void locke_appmanager_stop(LockeAppManager *lam);
 void locke_appmanager_set_state(LockeAppManager *lam,
 		LockeAppManagerState state);
-void locke_appmanager_add_application(LockeAppManager *lam);
-void locke_appmanager_remove_application(LockeAppManager *lam);
 void locke_appmanager_scan_for_deploys(LockeAppManager *lam, GFile *deployDir);
+void locke_appmanager_add_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
+void locke_appmanager_remove_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
+gboolean locke_appmanager_is_valid_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
 
 #endif /* LOCKE_APPMANAGER_H_ */
 
