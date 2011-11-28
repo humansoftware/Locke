@@ -8,16 +8,17 @@
  *  This file includes the main function and corresponds to the app server itself.
  *
  */
+#include <locke.h>
+#include <locke_system.h>
+#include <locke_appmanager.h>
+#include <locke_application.h>
 
 #include <stdio.h>
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <glib-object.h>
 #include <signal.h>
-
-#include <locke.h>
-#include <locke_system.h>
-#include <locke_appmanager.h>
+#include <unistd.h>
 
 gboolean timeout_callback(gpointer data) {
 	static int i = 0;
@@ -32,20 +33,16 @@ gboolean timeout_callback(gpointer data) {
 	return TRUE;
 }
 
-/* The program main loop */
-GMainLoop *loop;
-
 static void signals_handler(int signum) {
-	printf(" Signal %d detected!! \n ", signum);
+	printf("PID(%d) Signal %d detected!! \n ", getpid(), signum);
 	if (signum == SIGSEGV) {
-		fprintf(stderr,
-				" Too bad, received segmentation fault... bye bye. :( \n ");
+		fprintf(
+				stderr,
+				"PID(%d) Too bad, received segmentation fault... bye bye. :( \n ",
+				getpid());
 		exit(-1);
 	}
-	if (loop && g_main_loop_is_running(loop)) {
-		g_main_loop_quit(loop);
-	}
-
+	locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
 }
 
 int main(int argc, char *argv[]) {
@@ -55,22 +52,19 @@ int main(int argc, char *argv[]) {
 	signal(SIGTERM, signals_handler);
 	signal(SIGSEGV, signals_handler);
 
-	g_print("============================================================================\n");
+	g_print(
+			"============================================================================\n");
 	g_print("Locke server v%d.%d\n", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
-	g_print("============================================================================\n");
+	g_print(
+			"============================================================================\n");
 	g_print("Starting glib backend\n");
 	/* Initialize GLib type system */
 	g_type_init();
 
 	g_print("Creating main loop\n");
-	/* Create the main loop */
-	loop = g_main_loop_new(NULL, FALSE);
-
-	/* add source to default context */
-	/* g_timeout_add (1000, timeout_callback , loop); */
-
 	/* Init system */
 	LockeSystem *system = locke_system_get_singleton(argc, argv);
+	locke_system_set_serverpid(system, getpid());
 
 	/* Create application manager */
 	gchar deployFolder[1024];
@@ -87,18 +81,33 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Unable to Init application manager: %s\n",
 				err->message);
 		g_error_free(err);
-	} else {
+		goto locke_main_finally;
+	}
+	/* Applications may have been started on init call
+	 * If so, do not start server loop */
+	if (locke_system_get_child(system) == FALSE) {
 		locke_appmanager_set_state(appmanager, SERVER_RUNNING);
 		/* Run the main loop */
-		g_main_loop_run(loop);
-		/* main loop done*/
-		locke_appmanager_set_state(appmanager, SERVER_STOPPING);
-		g_main_loop_unref(loop);
+		locke_system_start_mainloop(system);
 	}
+	/*
+	 * Applications may have been started after main loop was running. If so,
+	 * destroy the unused memory and start the app
+	 * */
+	if (locke_system_get_child(system) == TRUE) { /* It's the application child process created */
+		/*child process won't need server memory */
+		/* locke_appmanager_destroy(appmanager); */
+		LockeApplication *app = locke_application_get_singleton();
+		locke_application_run(app);
+		locke_application_destroy_singleton();
+		return 0;
+	}
+	/* main loop done*/
+	locke_appmanager_set_state(appmanager, SERVER_STOPPING);
 
 	locke_appmanager_stop(appmanager);
+	locke_main_finally: locke_appmanager_set_state(appmanager, SERVER_STOPPED);
 	locke_appmanager_destroy(appmanager);
-	locke_appmanager_set_state(appmanager, SERVER_STOPPED);
 	return 0;
 }
 

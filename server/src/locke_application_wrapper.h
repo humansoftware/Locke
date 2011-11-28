@@ -15,10 +15,20 @@
 
 #ifndef LOCKE_APPLICATION_WRAPPER_H_
 #define LOCKE_APPLICATION_WRAPPER_H_
-
+#include <unistd.h>
+#include <glib.h>
+#include <gio/gio.h>
 
 typedef struct _LockeApplicationWrapper {
-	int b;
+	GFile *applicationFolder;
+	gchar appName[1024];
+	pid_t pid;
 } LockeApplicationWrapper;
+
+LockeApplicationWrapper *locke_application_wrapper_new(const gchar *baseDir,
+		const gchar *filename, GError **err);
+void locke_application_wrapper_destroy(LockeApplicationWrapper *law);
+void locke_application_wrapper_set_pid(LockeApplicationWrapper *ls, pid_t pid);
+pid_t locke_application_wrapper_get_pid(LockeApplicationWrapper *ls);
 
 #endif /* LOCKE_APPLICATION_WRAPPER_H_ */

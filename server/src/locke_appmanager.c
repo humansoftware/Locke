@@ -20,18 +20,19 @@ locke_appmanager_file_changed(GFileMonitor *file_monitor, GFile *child,
 LockeAppManager *locke_appmanager_new() {
 	LockeAppManager * result = (LockeAppManager *) calloc(1,
 			sizeof(LockeAppManager));
-	result->appList = g_hash_table_new(NULL, &g_str_equal);
+	result->appList = g_hash_table_new(g_str_hash, g_str_equal);
 	return result;
 }
 
 void locke_appmanager_destroy(LockeAppManager *lam) {
-	g_print("Destroying application manager\n");
+	/* TODO use a log utility that automatically puts PID on the logs */
+	g_print("PID (%d) Destroying application manager\n", getpid());
 	if (lam->deployDirMonitor != NULL)
 		g_object_unref(lam->deployDirMonitor);
 	g_hash_table_unref(lam->appList);
 	g_object_unref(lam->deployFolder);
 	free(lam);
-	g_print("Ok, application manager destroyed\n");
+	g_print("PID(%d) Ok, application manager destroyed\n", getpid());
 }
 void locke_appmanager_init(LockeAppManager *lam, gchar *folder, GError **err) {
 	gchar deployFolder[1024];
@@ -66,9 +67,17 @@ void locke_appmanager_init(LockeAppManager *lam, gchar *folder, GError **err) {
 			G_CALLBACK (locke_appmanager_file_changed), lam);
 
 }
+gboolean locke_appmanager_hash_removal(gpointer key, gpointer value,
+		gpointer user_data) {
+	LockeApplicationWrapper *law = (LockeApplicationWrapper *) value;
+	locke_application_wrapper_destroy(law);
+	return TRUE;
+}
 
 void locke_appmanager_stop(LockeAppManager *lam) {
-
+	g_hash_table_foreach_remove(lam->appList, locke_appmanager_hash_removal,
+			lam);
+	g_print("Number of apps: %d\n", g_hash_table_size(lam->appList));
 }
 
 void locke_appmanager_set_state(LockeAppManager *lam,
@@ -77,19 +86,20 @@ void locke_appmanager_set_state(LockeAppManager *lam,
 			"============================================================================\n");
 	switch (state) {
 	case SERVER_STARTING:
-		g_print("Server entered STARTING state. \n");
+		g_print("PID(%d) Server entered STARTING state. \n", getpid());
 		break;
 	case SERVER_RUNNING:
-		g_print("Server entered RUNNING state. \n");
+		g_print("PID(%d) Server entered RUNNING state. \n", getpid());
 		break;
 	case SERVER_STOPPING:
-		g_print("Server entered STOPPING state. \n");
+		g_print("PID(%d) Server entered STOPPING state. \n", getpid());
 		break;
 	case SERVER_STOPPED:
-		g_print("Server entered STOPPED state. \n");
+		g_print("PID(%d) Server entered STOPPED state. \n", getpid());
 		break;
 	default:
-		g_print("Invalid server state '%d' - ignoring \n", state);
+		g_print("PID(%d) Invalid server state '%d' - ignoring \n", getpid(),
+				state);
 		return;
 		break;
 	}
@@ -103,18 +113,18 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 		gpointer user_data) {
 	LockeAppManager *lam = (LockeAppManager *) user_data;
 	g_print("\n-----------------------------------------------------\n");
-	g_print("Something has changed at '%s'. \nChecking...\n",
+	g_print("PID=%d Something has changed at '%s'. \nChecking...\n", getpid(),
 			g_file_get_path(lam->deployFolder));
 	switch (event_type) {
 	case G_FILE_MONITOR_EVENT_DELETED:
 		g_print("'%s' removed\n", g_file_get_basename(child));
+		g_print("'%s' removed (other file) \n", g_file_get_basename(other_file));
 		if (g_file_has_parent(child, lam->deployFolder)) {
 			char *path = g_file_get_path(child);
 			g_print(
 					" =========> I am going to try to remove the application at path '%s' \n",
 					path);
 			locke_appmanager_remove_application(lam,
-					g_file_get_path(lam->deployFolder),
 					g_file_get_basename(child));
 		}
 		break;
@@ -264,13 +274,33 @@ gboolean locke_appmanager_is_valid_application(LockeAppManager *lam,
 void locke_appmanager_add_application(LockeAppManager *lam,
 		const gchar *baseDir, const gchar *filename) {
 	if (!locke_appmanager_is_valid_application(lam, baseDir, filename)) {
-		fprintf(stderr, "Application %s is not valid! Ignoring it! \n",
+		fprintf(stderr, "Application '%s' is not valid! Ignoring it! \n",
 				filename);
 		return;
 	}
 
+	GError *err = NULL;
+	LockeApplicationWrapper *law = locke_application_wrapper_new(baseDir,
+			filename, &err);
+	if (err != NULL) {
+		g_print("err = %p \n", err);
+		/* Report error to user, and free error */
+		fprintf(stderr, "Error creating application '%s': %s\n", filename,
+				err->message);
+		g_error_free(err);
+	}
+	if (law != NULL) { /* Inserts application at the application list */
+		g_hash_table_insert(lam->appList, (gpointer) filename, law);
+	}
 }
 void locke_appmanager_remove_application(LockeAppManager *lam,
-		const gchar *baseDir, const gchar *filename) {
+		const gchar *filename) {
+	LockeApplicationWrapper *law = g_hash_table_lookup(lam->appList, filename);
+	if (law == NULL) {
+		g_print("Couldn't find app named '%s' to remove!!! ", filename);
+		return;
+	}
+	g_hash_table_remove(lam->appList, filename);
+	locke_application_wrapper_destroy(law);
 
 }

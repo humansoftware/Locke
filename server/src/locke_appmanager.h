@@ -14,7 +14,7 @@
 #define LOCKE_APPMANAGER_H_
 #include <glib.h>
 #include <gio/gio.h>
-#include <locke_application.h>
+#include <locke_application_wrapper.h>
 
 typedef enum {
 	SERVER_STARTING = 1, SERVER_RUNNING, SERVER_STOPPING, SERVER_STOPPED
@@ -35,7 +35,7 @@ void locke_appmanager_set_state(LockeAppManager *lam,
 		LockeAppManagerState state);
 void locke_appmanager_scan_for_deploys(LockeAppManager *lam, GFile *deployDir);
 void locke_appmanager_add_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
-void locke_appmanager_remove_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
+void locke_appmanager_remove_application(LockeAppManager *lam, const gchar *filename);
 gboolean locke_appmanager_is_valid_application(LockeAppManager *lam, const gchar *baseDir, const gchar *filename);
 
 #endif /* LOCKE_APPMANAGER_H_ */

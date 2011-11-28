@@ -8,7 +8,7 @@ LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS)
 
 PROGNAME=locke
 OBJS=locke.o locke_appmanager.o \
-	locke_application.o locke_system.o
+	locke_application.o locke_system.o locke_application_wrapper.o
 
 all: $(OBJS)	
 	echo $(GLIB_LIBS)

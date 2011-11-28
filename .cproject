@@ -45,8 +45,8 @@
 									<listOptionValue builtIn="false" value="&quot;C:\cygwin\lib\glib-2.0\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\cygwin\usr\include\glib-2.0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${GLIB_ROOT}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/include/asm-generic"/>
 									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/asm-generic"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1799987515" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
 							</tool>

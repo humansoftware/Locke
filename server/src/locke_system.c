@@ -8,14 +8,14 @@
 #include <locke_system.h>
 #include <glib/gprintf.h>
 
-LockeSystem *_instance = NULL;
+LockeSystem *locke_system_instance = NULL;
 
 LockeSystem *locke_system_get_singleton(int argc, char *argv[]) {
-	if (_instance == NULL) {
-		_instance = locke_system_new();
-		locke_system_init(_instance, argc, argv);
+	if (locke_system_instance == NULL) {
+		locke_system_instance = locke_system_new();
+		locke_system_init(locke_system_instance, argc, argv);
 	}
-	return _instance;
+	return locke_system_instance;
 }
 
 LockeSystem *locke_system_new() {
@@ -34,6 +34,38 @@ void locke_system_init(LockeSystem *ls, int argc, char *argv[]) {
 	}
 	strcpy(ls->appFolder, folder);
 	g_print("Application folder set to %s\n", ls->appFolder);
+
+	ls->isChildProcess = FALSE;
 }
 
+void locke_system_set_child(LockeSystem *ls, gboolean child) {
+	ls->isChildProcess = child;
+}
+gboolean locke_system_get_child(LockeSystem *ls) {
+	return ls->isChildProcess;
+}
+
+void locke_system_start_mainloop(LockeSystem *ls) {
+	/* Create the main loop */
+	ls->loop = g_main_loop_new(NULL, FALSE);
+
+	/* add source to default context */
+	/* g_timeout_add (1000, timeout_callback , loop); */
+	g_main_loop_run(ls->loop);
+}
+
+void locke_system_quit_mainloop(LockeSystem *ls) {
+	if (ls->loop && g_main_loop_is_running(ls->loop)) {
+		g_main_loop_quit(ls->loop);
+		g_main_loop_unref(ls->loop);
+		ls->loop = NULL;
+	}
+}
+
+void locke_system_set_serverpid(LockeSystem *ls, pid_t pid) {
+	ls->serverPid = pid;
+}
+pid_t locke_system_get_serverpid(LockeSystem *ls) {
+	return ls->serverPid;
+}
 

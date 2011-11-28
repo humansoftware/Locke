@@ -12,10 +12,23 @@
 
 #ifndef LOCKE_APPLICATION_H_
 #define LOCKE_APPLICATION_H_
+#include <glib.h>
+#include <gio/gio.h>
 
 typedef struct _LockeApplication {
-	int b;
+	GFile *appFolder;
+	GFile *deployFolder;
+	gchar basename[1024];
+	GFile *appDllFile;
+	GFile *configFile;
 } LockeApplication;
 
+LockeApplication *locke_application_get_singleton();
+LockeApplication *locke_application_new();
+void locke_application_destroy(LockeApplication *app);
+void locke_application_destroy_singleton();
+void locke_application_run(LockeApplication *app);
+void locke_application_load(LockeApplication *app);
+void locke_application_init(LockeApplication *app, const gchar *baseDir, const gchar *filename);
 
 #endif /* LOCKE_APPLICATION_H_ */
