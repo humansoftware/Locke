@@ -12,6 +12,18 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifdef G_OS_WIN32
+#define DLL_EXT "dll"
+#else
+
+#ifdef __CYGWIN32__
+#define DLL_EXT "dll"
+#else
+#define DLL_EXT "so"
+#endif
+
+#endif
+
 typedef struct _LockeSystem {
 	gchar appFolder[1024];
 	/* This should return TRUE in case of application process */

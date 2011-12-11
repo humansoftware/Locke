@@ -22,6 +22,20 @@
 #ifndef LOCKE_API_H_
 #define LOCKE_API_H_
 
+typedef struct _LSocketRequest {
+	char *request_data;
+	int   request_size;
+} LSocketRequest;
+
+/* ---------------Callbacks that should be implemented by the application ----*/
+/** Callback called when application is first started */
+typedef void(*LockeAppOnStart)      (void);
+/** Callback called when application is stopped */
+typedef void(*LockeAppOnStop)      (void);
+/** Callback called when application receives socket data */
+typedef void(*LockeAppOnSocketRequest)      (LSocketRequest * /* request */);
+
+
 
 
 #endif /* LOCKE_API_H_ */

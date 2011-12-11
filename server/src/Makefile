@@ -15,6 +15,5 @@ all: $(OBJS)
 	$(CC) $(OBJS) -o $(PROGNAME) $(LDFLAGS)
 
 clean:
-	clear
 	rm -f *.o $(PROGNAME)	
 

@@ -12,10 +12,31 @@
 
 #ifndef LOCKE_APPLICATION_H_
 #define LOCKE_APPLICATION_H_
+#include <locke_api.h>
 #include <glib.h>
 #include <gio/gio.h>
 
+/* Error type definitions */
+#define LAPP_MODULE_ERROR locke_application_error_quark ()
+GQuark locke_application_error_quark (void);
+
+typedef enum {
+	LAPP_MODULE_LOAD_ERROR,
+	LAPP_MODULE_OPEN_ERROR,
+	LAPP_MODULE_NULL
+} LockeApplicationErrors;
+
+/* Application callback events */
+typedef struct _LockeApplicationEvents {
+	LockeAppOnStart 			lockeapp_on_start;
+	LockeAppOnStop  			lockeapp_on_stop;
+	LockeAppOnSocketRequest 	lockeapp_on_socket_request;
+} LockeApplicationEvents;
+
+/* Application itself */
 typedef struct _LockeApplication {
+	LockeApplicationEvents events;
+	GModule *loaded_module;
 	GFile *appFolder;
 	GFile *deployFolder;
 	gchar basename[1024];
@@ -28,7 +49,8 @@ LockeApplication *locke_application_new();
 void locke_application_destroy(LockeApplication *app);
 void locke_application_destroy_singleton();
 void locke_application_run(LockeApplication *app);
-void locke_application_load(LockeApplication *app);
+void locke_application_load(LockeApplication *app, GError **error);
+void locke_application_load_callback(LockeApplication *app, const char* name, gpointer *method_pointer, GError **error);
 void locke_application_init(LockeApplication *app, const gchar *baseDir, const gchar *filename);
 
 #endif /* LOCKE_APPLICATION_H_ */

@@ -34,15 +34,21 @@ gboolean timeout_callback(gpointer data) {
 }
 
 static void signals_handler(int signum) {
-	printf("PID(%d) Signal %d detected!! \n ", getpid(), signum);
-	if (signum == SIGSEGV) {
-		fprintf(
-				stderr,
-				"PID(%d) Too bad, received segmentation fault... bye bye. :( \n ",
-				getpid());
-		exit(-1);
+	/* Any received signal will terminate the server */
+	printf("PID (%d) Received signal [%d]!", getpid(), signum);
+	switch (signum) {
+	case SIGSEGV:
+		/* segmentation fault - finishes server
+		 * overrides signal handler to default and kill the process again, to generate the core file */
+		signal(signum, SIG_DFL);
+		kill(getpid(), signum);
+		break;
+	default:
+		printf("Finishing server\n");
+		locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
+		break;
 	}
-	locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
+	return;
 }
 
 int main(int argc, char *argv[]) {

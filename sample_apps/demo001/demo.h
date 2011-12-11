@@ -1,3 +1,5 @@
+#include <locke_api.h>
 
-
-int locke_on_open();
+void lockeapp_on_start();
+void lockeapp_on_stop();
+void lockeapp_on_socket_request(LSocketRequest request);

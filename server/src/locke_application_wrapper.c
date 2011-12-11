@@ -47,7 +47,6 @@ void locke_application_wrapper_destroy(LockeApplicationWrapper *law) {
 	kill(law->pid, SIGTERM);
 	if (law != NULL)
 		free(law);
-
 	g_print(" Application stopped \n");
 }
 

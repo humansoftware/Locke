@@ -6,6 +6,7 @@
  */
 
 #include <locke_appmanager.h>
+#include <locke_system.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -118,7 +119,6 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 	switch (event_type) {
 	case G_FILE_MONITOR_EVENT_DELETED:
 		g_print("'%s' removed\n", g_file_get_basename(child));
-		g_print("'%s' removed (other file) \n", g_file_get_basename(other_file));
 		if (g_file_has_parent(child, lam->deployFolder)) {
 			char *path = g_file_get_path(child);
 			g_print(
@@ -159,9 +159,8 @@ static void locke_appmanager_file_changed(GFileMonitor *file_monitor,
 				G_FILE_MONITOR_EVENT_CREATED, user_data);
 		break;
 	default:
-		/* g_print("'%s' received event %d \n", g_file_get_basename(child),
+		g_print("'%s' received event %d \n", g_file_get_basename(child),
 		 event_type);
-		 */
 		break;
 	}
 }
@@ -241,7 +240,9 @@ gboolean locke_appmanager_is_valid_application(LockeAppManager *lam,
 	strcpy(fullpath, appfolder);
 	strcat(fullpath, "lib");
 	strcat(fullpath, filename);
-	strcat(fullpath, ".so");
+	strcat(fullpath, ".");
+	strcat(fullpath, DLL_EXT);
+
 	GFile *file = g_file_new_for_path(fullpath);
 	if (g_file_query_file_type(file, G_FILE_QUERY_INFO_NONE, NULL)
 			!= G_FILE_TYPE_REGULAR) {
