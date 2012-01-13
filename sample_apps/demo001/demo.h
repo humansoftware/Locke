@@ -2,4 +2,4 @@
 
 void lockeapp_on_start();
 void lockeapp_on_stop();
-void lockeapp_on_socket_request(LSocketRequest request);
+void lockeapp_on_request(void *request_data);

@@ -10,12 +10,15 @@
 
 LockeSystem *locke_system_instance = NULL;
 
-LockeSystem *locke_system_get_singleton(int argc, char *argv[]) {
+LockeSystem *locke_system_init_singleton(int argc, char *argv[]) {
 	if (locke_system_instance == NULL) {
 		locke_system_instance = locke_system_new();
 		locke_system_init(locke_system_instance, argc, argv);
 	}
 	return locke_system_instance;
+}
+LockeSystem *locke_system_get_singleton() {
+	return locke_system_init_singleton(0, NULL);
 }
 
 LockeSystem *locke_system_new() {

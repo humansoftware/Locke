@@ -11,6 +11,7 @@
 #include <locke.h>
 #include <locke_system.h>
 #include <locke_appmanager.h>
+#include <locke_service_manager.h>
 #include <locke_application.h>
 
 #include <stdio.h>
@@ -45,7 +46,7 @@ static void signals_handler(int signum) {
 		break;
 	default:
 		printf("Finishing server\n");
-		locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
+		locke_system_quit_mainloop(locke_system_get_singleton());
 		break;
 	}
 	return;
@@ -69,8 +70,11 @@ int main(int argc, char *argv[]) {
 
 	g_print("Creating main loop\n");
 	/* Init system */
-	LockeSystem *system = locke_system_get_singleton(argc, argv);
+	LockeSystem *system = locke_system_init_singleton(argc, argv);
 	locke_system_set_serverpid(system, getpid());
+
+	/* Create service manager */
+	locke_service_manager_get_singleton();
 
 	/* Create application manager */
 	gchar deployFolder[1024];
@@ -106,6 +110,8 @@ int main(int argc, char *argv[]) {
 		LockeApplication *app = locke_application_get_singleton();
 		locke_application_run(app);
 		locke_application_destroy_singleton();
+		/* Destroy service manager */
+		locke_service_manager_destroy_singleton();
 		return 0;
 	}
 	/* main loop done*/
@@ -114,6 +120,8 @@ int main(int argc, char *argv[]) {
 	locke_appmanager_stop(appmanager);
 	locke_main_finally: locke_appmanager_set_state(appmanager, SERVER_STOPPED);
 	locke_appmanager_destroy(appmanager);
+	/* Destroy service manager */
+	locke_service_manager_destroy_singleton();
 	return 0;
 }
 

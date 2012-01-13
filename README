@@ -4,13 +4,50 @@ The name of the project was a tribute to [John Locke, http://en.wikipedia.org/wi
 --------------------------
 Introduction
 --------------------------
-Java developers have several tools at their disposal to write business rules components, like Session EJBs (Enterprise Java Beans) and MDBs (Message Driven Beans), as specified in Java Enterprise Edition (JEE) specification.
-The main reason many programmers and architects choose to use Java is the availability of such tools. These is how it works in JEE world:
-- You write a piece of code (EJB)  that contains only your specific business rules, database and legacy systems access.  You must do it by following the specification.
-- You deploy this compiled piece of code, which made use of a JEE API onto your Application Server, a product that follows the JEE specification.
-- Your piece of code turns available to be called as a service (RMI, SOAP, CORBA, REST, etc.) and has a lot of tunning parameters configurable by the Application Server administration interface. All the infrastructure needed to run and make available your piece of code is provided by the app server. 
+Locke is a general purpose application server that allows you to easily create and distribute applications that run onto it. A Locke Application is a library made using the Locke API that contains the business rules specific to you app. Once deployed in Locke server, Locke will listen to a TCP port and the application methods will automatically be called whenever a request is made to the server. At this point, it supports only HTTP and Socket requests, but web services and REST support is planned for a near future. 
+Each application on Locke runs on a different process, so if you accidentaly make any mistake on your code, it will not turn the entire app server down, just your application. Also, Locke supports automatic application restarts in this cases, by implementing a watchdog thread in the server process.
 
-The idea of Locke is doing the same thing described above, but using C. By using a fully compiled solution, but as simple to use as JEE, you get the best of two worlds: c performance, flexibility and interoperability, joined with a easy to use yet powerful and pre-tested platform that makes your application being Robust.
+--------------------------
+Compiling 
+--------------------------
+At this moment, Locke only support makefiles and doesn't use autoconf, automake, sconf, cmake or anything like this. However, if you have a working version of glib installed in your system, this shouldn't be a problem.
+The Makefile was made to run on any Linux machine, but you can easily change the compile flags on $LOCKE_SRC/Makefile.common to support other platforms. 
+The supported make targets are: clean, all and dist. Use 'make dist' to generate the binary distro.
 
-Locke is in planning phase.
+--------------------------
+Folder Structure
+--------------------------
+To start using Locke, the easiest way is to install the dependencies on your machine, download the binary distro and unpack it using the following command:
+tar -zxvf locke.tgz -C DEST_FOLDER
+where DEST_FOLDER is the one where you want the server installed. Point the environment variable LOCKE_HOME to this DEST_FOLDER.
+The binary distro contains the following folder structure:
+- / = The root folder of the distro. You can set the LOCKE_HOME environment variable to set this folder manually
+- /api = folder that contains API header files you should include when creating your application
+- /autodeploy = deploy folder. Just copy your application to this folder and Locke will automatically load it.
+- /config = general configuration files. Contains config which is not application specific.
+- /documentation = server detailed docs
+- /log = log files generated when you run the application 
+- /var = folder used by the server to store persistent data, when aplicable
+- /start_locke.sh = server start up script. Run it to start the server
+- /stop_locke.sh  = server stop script. Run it to stop a running server
+
+--------------------------
+Application folder structure
+--------------------------
+A valid Locke application should follow this rules:
+- it should be a folder that contains a .cfg file and a .so/.dll file
+- the name of the .cfg file, the .so file and the folder's name should all be the same.
+
+--------------------------
+Creating your first application 
+--------------------------
+
+
+
+
+
+
+
+
+
 

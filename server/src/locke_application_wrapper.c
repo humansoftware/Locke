@@ -22,8 +22,8 @@ LockeApplicationWrapper *locke_application_wrapper_new(const gchar *baseDir,
 		LockeApplication *app = locke_application_get_singleton();
 		locke_application_init(app, baseDir, filename);
 		/* Sets child process flag*/
-		locke_system_set_child(locke_system_get_singleton(0, NULL), TRUE);
-		locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
+		locke_system_set_child(locke_system_get_singleton(), TRUE);
+		locke_system_quit_mainloop(locke_system_get_singleton());
 		return NULL;
 	} else if (pid < 0) { /* fork failed */
 		g_set_error(err, 0, /* error domain */

@@ -30,7 +30,7 @@ typedef enum {
 typedef struct _LockeApplicationEvents {
 	LockeAppOnStart 			lockeapp_on_start;
 	LockeAppOnStop  			lockeapp_on_stop;
-	LockeAppOnSocketRequest 	lockeapp_on_socket_request;
+	LockeAppOnRequest 			lockeapp_on_request;
 } LockeApplicationEvents;
 
 /* Application itself */
@@ -45,9 +45,9 @@ typedef struct _LockeApplication {
 } LockeApplication;
 
 LockeApplication *locke_application_get_singleton();
+void locke_application_destroy_singleton();
 LockeApplication *locke_application_new();
 void locke_application_destroy(LockeApplication *app);
-void locke_application_destroy_singleton();
 void locke_application_run(LockeApplication *app);
 void locke_application_load(LockeApplication *app, GError **error);
 void locke_application_load_callback(LockeApplication *app, const char* name, gpointer *method_pointer, GError **error);

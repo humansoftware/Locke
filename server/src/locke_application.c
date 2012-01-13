@@ -30,7 +30,7 @@ void locke_application_signal_handler(int signum) {
 		break;
 	default:
 		printf("Finishing application \n");
-		locke_system_quit_mainloop(locke_system_get_singleton(0, NULL));
+		locke_system_quit_mainloop(locke_system_get_singleton());
 		break;
 	}
 	return;
@@ -77,10 +77,10 @@ void locke_application_run(LockeApplication *app) {
 	}
 
 	/* TODO call dll method to set up the app, start servicing requests on a port and be able to call
-	 * and application method on each request */
+	 * an application method on each request */
 	app->events.lockeapp_on_start();
 
-	locke_system_start_mainloop(locke_system_get_singleton(0, NULL));
+	locke_system_start_mainloop(locke_system_get_singleton());
 }
 
 void locke_application_load_callback(LockeApplication *app, const char* name,
@@ -106,7 +106,6 @@ void locke_application_load_callback(LockeApplication *app, const char* name,
 }
 
 void locke_application_load(LockeApplication *app, GError **error) {
-	/* TODO Load the application itself, using the dll module loader */
 	app->loaded_module = g_module_open(g_file_get_path(app->appDllFile),
 			G_MODULE_BIND_LAZY);
 	if (!app->loaded_module) {
@@ -122,8 +121,8 @@ void locke_application_load(LockeApplication *app, GError **error) {
 			(gpointer *) &(app->events.lockeapp_on_stop), error);
 	if (*error != NULL)
 		return;
-	locke_application_load_callback(app, "lockeapp_on_socket_request",
-			(gpointer *) &(app->events.lockeapp_on_socket_request), error);
+	locke_application_load_callback(app, "lockeapp_on_request",
+			(gpointer *) &(app->events.lockeapp_on_request), error);
 	if (*error != NULL)
 		return;
 }

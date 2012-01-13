@@ -34,7 +34,8 @@ typedef struct _LockeSystem {
 	pid_t serverPid;
 } LockeSystem;
 
-LockeSystem *locke_system_get_singleton(int argc, char *argv[]);
+LockeSystem *locke_system_init_singleton(int argc, char *argv[]);
+LockeSystem *locke_system_get_singleton();
 LockeSystem *locke_system_new();
 void locke_system_init(LockeSystem *ls, int argc, char *argv[]);
 void locke_system_set_child(LockeSystem *ls, gboolean child);
