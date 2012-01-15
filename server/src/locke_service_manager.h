@@ -15,6 +15,7 @@
 #include <locke_service.h>
 #include <glib.h>
 #include <gio/gio.h>
+#include <locke_log.h>
 
 typedef struct _LockeServiceManager {
 	GHashTable * services;

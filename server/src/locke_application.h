@@ -12,6 +12,9 @@
 
 #ifndef LOCKE_APPLICATION_H_
 #define LOCKE_APPLICATION_H_
+
+#include <locke_service.h>
+#include <locke_service_manager.h>
 #include <locke_api.h>
 #include <glib.h>
 #include <gio/gio.h>
@@ -42,6 +45,10 @@ typedef struct _LockeApplication {
 	gchar basename[1024];
 	GFile *appDllFile;
 	GFile *configFile;
+	GKeyFile *config;
+
+	LockeService *service;
+	int port;
 } LockeApplication;
 
 LockeApplication *locke_application_get_singleton();

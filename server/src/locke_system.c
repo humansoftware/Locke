@@ -7,6 +7,7 @@
 
 #include <locke_system.h>
 #include <glib/gprintf.h>
+#include <locke_log.h>
 
 LockeSystem *locke_system_instance = NULL;
 
@@ -36,7 +37,7 @@ void locke_system_init(LockeSystem *ls, int argc, char *argv[]) {
 		folder[strlen(folder)] = '/';
 	}
 	strcpy(ls->appFolder, folder);
-	g_print("Application folder set to %s\n", ls->appFolder);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO, "Application folder set to %s", ls->appFolder);
 
 	ls->isChildProcess = FALSE;
 }

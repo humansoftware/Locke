@@ -10,10 +10,17 @@
 
 #include <locke_api.h>
 
+typedef struct _LockeServiceSocketRequest {
+	void *socket;
+} LockeServiceSocketRequest;
+
 /** Callback called to get service type name  */
 void locke_service_socket_type(void *type_name);
 /** Callback called to start servicing port  */
-int locke_service_socket_listen_port(void *user_data, int port,
+int locke_service_socket_listen_port(int port,
 		LockeAppOnRequest callback);
+
+int locke_service_socket_receive(LockeServiceSocketRequest *request, char *buffer, int length);
+int locke_service_socket_send(LockeServiceSocketRequest *request, char *buffer, int length);
 
 #endif /* LOCKE_SERVICE_SOCKET_H_ */

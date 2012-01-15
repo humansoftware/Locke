@@ -9,11 +9,11 @@
 #include <string.h>
 
 void locke_service_http_type(void *type_name) {
-	strcpy(type_name, "SOCKET");
+	strcpy(type_name, "HTTP");
 }
 
 
-int locke_service_http_listen_port(void *user_data, int port,
+int locke_service_http_listen_port(int port,
 		LockeAppOnRequest callback) {
 
 	return 1;

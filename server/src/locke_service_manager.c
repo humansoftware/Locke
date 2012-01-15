@@ -9,6 +9,7 @@
 #include <locke_system.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locke_log.h>
 
 LockeServiceManager *locke_service_manager_instance = NULL;
 LockeServiceManager *locke_service_manager_get_singleton() {
@@ -32,11 +33,13 @@ void locke_service_manager_stop(LockeServiceManager *lsm) {
 void locke_service_manager_destroy(LockeServiceManager *lsm) {
 	if (lsm->services != NULL)
 		g_hash_table_destroy(lsm->services);
-	g_free(lsm->pluginsFolder);
+	g_object_unref(lsm->pluginsFolder);
 	g_free(lsm);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_DEBUG, "Service Manager destroyed");
 }
 
-LockeService *locke_service_manager_lookup_service(LockeServiceManager *lsm, const gchar *type_name) {
+LockeService *locke_service_manager_lookup_service(LockeServiceManager *lsm,
+		const gchar *type_name) {
 	return g_hash_table_lookup(lsm->services, type_name);
 }
 
@@ -68,23 +71,25 @@ void locke_service_manager_init(LockeServiceManager *lsm) {
 void locke_service_manager_scan_for_plugins(LockeServiceManager *lsm) {
 	if (g_file_query_file_type(lsm->pluginsFolder, G_FILE_QUERY_INFO_NONE, NULL)
 			!= G_FILE_TYPE_DIRECTORY) {
-		g_print(
-				"ERROR: services dir '%s' does not exist!! Create it to be able to service requests! \n",
+		g_log(
+				LSVR_DOMAIN,
+				G_LOG_LEVEL_WARNING,
+				"ERROR: services dir '%s' does not exist!! Create it to be able to service requests! ",
 				g_file_get_path(lsm->pluginsFolder));
 		return;
 	}
-	g_print("Scanning folder '%s' for service plugins\n",
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO,
+			"Scanning folder '%s' for service plugins\n",
 			g_file_get_path(lsm->pluginsFolder));
 
 	/* Get file enumerator */
 	GError *err = NULL;
 	GFileEnumerator *files = g_file_enumerate_children(lsm->pluginsFolder, "*",
 			G_FILE_QUERY_INFO_NONE, NULL, &err);
-	/* TODO create a generic function that receives err as argument and do all this stuff */
 	if (err != NULL) {
-		g_print("err = %p \n", err);
 		/* Report error to user, and free error */
-		fprintf(stderr, "Unable to get file list for directory '%s': %s\n",
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR,
+				"Unable to get file list for directory '%s': %s",
 				g_file_get_path(lsm->pluginsFolder), err->message);
 		g_error_free(err);
 		goto scan_for_plugins_finally;
@@ -95,9 +100,9 @@ void locke_service_manager_scan_for_plugins(LockeServiceManager *lsm) {
 	do {
 		fileInfo = g_file_enumerator_next_file(files, NULL, &err);
 		if (err != NULL) {
-			g_print("err = %p \n", err);
 			/* Report error to user, and free error */
-			fprintf(stderr, "Unable to get file for directory '%s': %s\n",
+			g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR,
+					"Unable to get file for directory '%s': %s",
 					g_file_get_path(lsm->pluginsFolder), err->message);
 			g_error_free(err);
 			goto scan_for_plugins_finally;
@@ -106,7 +111,8 @@ void locke_service_manager_scan_for_plugins(LockeServiceManager *lsm) {
 		if (fileInfo == NULL)
 			break;
 		/* process the file */
-		g_print(" =========> Registering service plugin '%s'\n",
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO,
+				" =========> Registering service plugin '%s'",
 				g_file_info_get_display_name(fileInfo));
 		locke_service_manager_register_service(lsm,
 				g_file_info_get_name(fileInfo));
@@ -115,10 +121,9 @@ void locke_service_manager_scan_for_plugins(LockeServiceManager *lsm) {
 	/* Close open things */
 	g_file_enumerator_close(files, NULL, &err);
 	if (err != NULL) {
-		g_print("err = %p \n", err);
 		/* Report error to user, and free error */
-		fprintf(stderr,
-				"Error closing file enumerator for directory '%s': %s\n",
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR,
+				"Error closing file enumerator for directory '%s': %s",
 				g_file_get_path(lsm->pluginsFolder), err->message);
 		g_error_free(err);
 		goto scan_for_plugins_finally;
@@ -136,14 +141,15 @@ void locke_service_manager_register_service(LockeServiceManager *lsm,
 	strcat(fullpath, filename);
 
 	LockeService *service = locke_service_new();
-	g_print("Trying to load service from plugin file '%s'\n", fullpath);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO,
+			"Loading service from plugin file '%s'", fullpath);
 	locke_service_init(service, fullpath);
 	GError *err = NULL;
 	locke_service_load(service, &err);
 	if (err != NULL) {
 		/* Report error to user, and free error */
-		fprintf(stderr, "Unable to load service plugin. Details: '%s'\n",
-				err->message);
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR,
+				"Unable to load service plugin. Details: '%s'", err->message);
 		g_error_free(err);
 		locke_service_destroy(service);
 		return;
@@ -151,9 +157,10 @@ void locke_service_manager_register_service(LockeServiceManager *lsm,
 	LockeService *old_service = g_hash_table_lookup(lsm->services,
 			service->name);
 	if (old_service != NULL) {
-		fprintf(
-				stderr,
-				"ERROR: There was already a plugin registered with name '%s'. I will replace it with the plugin from file '%s' \n",
+		g_log(
+				LSVR_DOMAIN,
+				G_LOG_LEVEL_ERROR,
+				"ERROR: There was already a plugin registered with name '%s'. I will replace it with the plugin from file '%s'",
 				service->name, fullpath);
 		locke_service_destroy(old_service);
 	}

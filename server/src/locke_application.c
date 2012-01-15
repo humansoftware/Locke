@@ -9,6 +9,7 @@
 #include <locke_system.h>
 #include <glib/gprintf.h>
 #include <stdlib.h>
+#include <locke_log.h>
 
 LockeApplication *locke_application_instance = NULL;
 LockeApplication *locke_application_get_singleton() {
@@ -20,7 +21,7 @@ LockeApplication *locke_application_get_singleton() {
 
 void locke_application_signal_handler(int signum) {
 	/* Any received signal will terminate the server */
-	printf("PID (%d) Received signal [%d]!", getpid(), signum);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_CRITICAL, "PID (%d) Received signal [%d]!", getpid(), signum);
 	switch (signum) {
 	case SIGSEGV:
 		/* segmentation fault - finishes server
@@ -29,7 +30,7 @@ void locke_application_signal_handler(int signum) {
 		kill(getpid(), signum);
 		break;
 	default:
-		printf("Finishing application \n");
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_CRITICAL, "Finishing application ");
 		locke_system_quit_mainloop(locke_system_get_singleton());
 		break;
 	}
@@ -57,27 +58,24 @@ void locke_application_run(LockeApplication *app) {
 	signal(SIGTERM, locke_application_signal_handler);
 	signal(SIGSEGV, locke_application_signal_handler);
 
-	g_print(
-			"============================================================================\n");
-	g_print("PID(%d) locke_application_run called on the child process!!! \n",
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG,
+			"============================================================================");
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG, "PID(%d) locke_application_run called on the child process!!! ",
 			getpid());
-	g_print(
-			"============================================================================\n");
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG,
+			"============================================================================");
 
 	GError *err = NULL;
 	locke_application_load(app, &err);
 	if (err != NULL) {
 		/* Report error to user, and free error */
-		fprintf(
-				stderr,
-				"Unable to Init application. I won't init app main loop, bye! Details: '%s'\n",
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR,
+				"Unable to Init application. I won't init app main loop, bye! Details: '%s'",
 				err->message);
 		g_error_free(err);
 		return;
 	}
 
-	/* TODO call dll method to set up the app, start servicing requests on a port and be able to call
-	 * an application method on each request */
 	app->events.lockeapp_on_start();
 
 	locke_system_start_mainloop(locke_system_get_singleton());
@@ -125,6 +123,42 @@ void locke_application_load(LockeApplication *app, GError **error) {
 			(gpointer *) &(app->events.lockeapp_on_request), error);
 	if (*error != NULL)
 		return;
+
+	app->config = g_key_file_new();
+	g_key_file_load_from_file(app->config, g_file_get_path(app->configFile),
+			G_KEY_FILE_NONE, error);
+	if (*error != NULL)
+		return;
+	gchar *service_type_str = g_key_file_get_value(app->config, "SERVICE",
+			"type", error);
+	if (service_type_str == NULL)
+		return;
+	gchar *port_str = g_key_file_get_value(app->config, "SERVICE", "port",
+			error);
+	if (port_str == NULL)
+		return;
+	LockeServiceManager *service_manager =
+			locke_service_manager_get_singleton();
+	app->service = locke_service_manager_lookup_service(service_manager,
+			service_type_str);
+	app->port = atoi(port_str);
+
+	/* if configured service type can't be found, generate a new exception */
+	if (app->service == NULL) {
+		g_set_error(error, LAPP_MODULE_ERROR, LAPP_MODULE_LOAD_ERROR,
+				"Couldn't find service type '%s'", service_type_str);
+		return;
+	}
+	/*Check if port is valid */
+	if (app->port <= 0) {
+		g_set_error(error, LAPP_MODULE_ERROR, LAPP_MODULE_LOAD_ERROR,
+				"Invalid port setting '%s'", port_str);
+		return;
+	}
+
+	locke_service_listen_port(app->service, app, app->port, app->events.lockeapp_on_request	);
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_INFO, "Servicing '%s' on port '%d'\n", service_type_str, app->port);
+
 }
 
 void locke_application_destroy_singleton() {
@@ -134,20 +168,22 @@ void locke_application_destroy_singleton() {
 	locke_application_instance = NULL;
 }
 void locke_application_destroy(LockeApplication *app) {
-	g_print(
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG,
 			"============================================================================\n");
-	g_print("PID(%d) Destroying application \n ", getpid());
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG, "PID(%d) Destroying application \n ", getpid());
 	if (app->loaded_module != NULL) {
 		app->events.lockeapp_on_stop();
 		if (!g_module_close(app->loaded_module))
-			g_warning(
-					"%s: %s", g_file_get_path(app->appDllFile), g_module_error ());
+			g_warning("%s: %s", g_file_get_path(app->appDllFile),
+					g_module_error());
 	}
 	g_object_unref(app->deployFolder);
 	g_object_unref(app->appFolder);
 	g_object_unref(app->appDllFile);
 	g_object_unref(app->configFile);
-	g_print(
+	if (app->config != NULL)
+		g_key_file_free(app->config);
+	g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG,
 			"============================================================================\n");
 }
 

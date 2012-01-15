@@ -3,7 +3,7 @@ include ../../common.makefile
 #The include dir reffers to the folder with header files that will be included by applications too
 API_DIR=../api
 
-CFLAGS=-g -Wall -O2 --ansi -D__USE_POSIX -I. -I/usr/include -I/usr/include/i386-linux-gnu/ -I$(API_DIR) $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS)
+CFLAGS=-g -Wall -O2 --ansi -D__USE_POSIX -I. -I/usr/include -I/usr/include/i386-linux-gnu/ -I$(API_DIR) $(GLIB_FLAGS) $(GIO_FLAGS) $(GMODULE_FLAGS) 
 LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS)
 
 PROGNAME=locke
@@ -14,8 +14,9 @@ OBJS=locke.o locke_appmanager.o \
 
 all: $(OBJS)	
 	echo $(GLIB_LIBS)
+	#ulimit -c unlimited
 	$(CC) $(OBJS) -o $(PROGNAME) $(LDFLAGS)
 
 clean:
-	rm -f *.o $(PROGNAME)	
+	rm -f *.o $(PROGNAME) core	
 

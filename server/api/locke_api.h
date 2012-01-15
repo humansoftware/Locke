@@ -29,7 +29,7 @@ typedef void(*LockeAppOnStart)      (void);
 /** Callback called when application is stopped */
 typedef void(*LockeAppOnStop)      (void);
 /** Callback called when application receives socket data */
-typedef void(*LockeAppOnRequest)      (void * /* user_data */, void * /* request_data */);
+typedef void(*LockeAppOnRequest)      (void * /* request_data */);
 
 
 

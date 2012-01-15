@@ -1,12 +1,25 @@
-/- Decide between C + GLIB against C++ + Boost  - decided - C + glib2.0
+
+Next features:
+
+- Implement the api for reading the app config file from inside the application
+- Implement REST support
+- Implement HTTP support
+- Implement web Services support
+- Implement database support
 - Replace current make files by some make tool like cmake or autoconf
-- Create the main program
-- Make main program run as a daemon
-- Make main program read configuration files, preferably in [yaml, http://www.yaml.org/]
-- Make main program listen to a port and attend requests
-- Choose between Threads or Process + IPC. It's imperative that seg faults on business units don't crash the server
-- Implement the multiple thread system and make it answer to requests
-- Build a file od BD queue system
-- Create an administration interface that communicates to the server and change the application files. Most likely the admin interface and any web part of the app server will be a ruby on rails app
-- Implement doc generation by using doxygen
+- Build a file or BD queue system
+- Create an administration interface that communicates to the server and change the application files. 
+- Implement doc generation by using doxygen (partially done)
 - Create a new library or use an existent one for database access. It's important that the connection pool parameters and connection data need to be configured by the admin interface.
+
+=======================================================================================================================
+RELEASE NOTES:
+
+> Done at 15/01/2012:
+ - Decide between C + GLIB against C++ + Boost  - decided - C + glib2.0
+ - Create the main program
+ - Make main program run as a daemon
+ - Make main program read configuration files, preferably in [yaml, http://www.yaml.org/]
+ - Make main program listen to a port and attend requests
+ - Choose between Threads or Process + IPC. It's imperative that seg faults on business units don't crash the server
+ - Implement the multiple thread system and make it answer to requests

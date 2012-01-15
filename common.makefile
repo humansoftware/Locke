@@ -26,3 +26,5 @@ GLIB_LIBS=$$(pkg-config --libs glib-2.0)
 GIO_LIBS=$$(pkg-config --libs gio-2.0)
 GMODULE_LIBS=$$(pkg-config --libs gmodule-2.0)
 LDFLAGS=$(GLIB_LIBS) $(GIO_LIBS) $(GMODULE_LIBS) 
+
+APP_DEPLOY_DIR=$(LOCKE_HOME)/server/src/autodeploy

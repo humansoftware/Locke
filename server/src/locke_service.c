@@ -15,6 +15,7 @@ LockeService * locke_service_new_builtin_socket_service() {
 	LockeService *service = locke_service_new();
 	locke_service_init(service, NULL);
 	service->events.locke_service_get_type_name = locke_service_socket_type;
+	locke_service_socket_type(service->name);
 	service->events.locke_service_listen_port =
 			locke_service_socket_listen_port;
 	return service;
@@ -24,6 +25,7 @@ LockeService * locke_service_new_builtin_http_service() {
 	LockeService *service = locke_service_new();
 	locke_service_init(service, NULL);
 	service->events.locke_service_get_type_name = locke_service_http_type;
+	locke_service_http_type(service->name);
 	service->events.locke_service_listen_port = locke_service_http_listen_port;
 	return service;
 }
@@ -105,18 +107,11 @@ int locke_service_listen_port(LockeService *service, void *user_data, int port,
 
 	service->instances = g_slist_prepend(service->instances, instance);
 
-	return service->events.locke_service_listen_port(instance, port,
-			locke_service_on_request);
+	return service->events.locke_service_listen_port(port,
+			callback);
 }
 
-void locke_service_on_request(void *user_data, void *request_data) {
-	LockeServiceInstance * instance = (LockeServiceInstance *) user_data;
-	if (instance == NULL)
-		return;
-	if (instance->callback == NULL)
-		return;
-	instance->callback(instance->user_data, request_data);
-}
+
 
 void locke_service_init(LockeService *service, char *dll_filename) {
 	service->instances = NULL;
@@ -125,3 +120,4 @@ void locke_service_init(LockeService *service, char *dll_filename) {
 			(dll_filename != NULL) ? g_file_new_for_path(dll_filename) : NULL;
 
 }
+

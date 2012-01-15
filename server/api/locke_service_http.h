@@ -13,7 +13,7 @@
 /** Callback called to get service type name  */
 void locke_service_http_type(void *type_name);
 /** Callback called to start servicing port  */
-int locke_service_http_listen_port(void *user_data, int port,
+int locke_service_http_listen_port(int port,
 		LockeAppOnRequest callback);
 
 

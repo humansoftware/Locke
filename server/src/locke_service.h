@@ -12,10 +12,16 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+typedef struct _LockeServiceInstance {
+	int port;
+	LockeAppOnRequest callback;
+	void *user_data;
+} LockeServiceInstance;
+
 /** Callback called to get service type name  */
 typedef void (*LockeServiceGetTypeName)(void *type_name);
 /** Callback called to start servicing port  */
-typedef int(*LockeServiceListenPort)(void *user_data, int port,
+typedef int(*LockeServiceListenPort)(int port,
 		LockeAppOnRequest callback);
 
 /* Service callback events */
@@ -30,12 +36,6 @@ GQuark locke_service_error_quark(void);
 typedef enum {
 	LSERVICE_MODULE_LOAD_ERROR, LSERVICE_MODULE_OPEN_ERROR, LSERVICE_MODULE_NULL
 } LockeServiceErrors;
-
-typedef struct _LockeServiceInstance {
-	int port;
-	LockeAppOnRequest callback;
-	void *user_data;
-} LockeServiceInstance;
 
 typedef struct _LockeService {
 	char name[1024];

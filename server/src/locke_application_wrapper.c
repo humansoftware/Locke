@@ -12,12 +12,13 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
+#include <locke_log.h>
 
 LockeApplicationWrapper *locke_application_wrapper_new(const gchar *baseDir,
 		const gchar *filename, GError **err) {
 	pid_t pid = fork();
 	if (pid == 0) { /* child process */
-		g_print("PID(%d) I am an application child process. Will free the unused memory and start the app!\n", getpid());
+		g_log(LAPP_DOMAIN, G_LOG_LEVEL_DEBUG, "PID(%d) I am an application child process. Will free the unused memory and start the app!", getpid());
 		/* Create application */
 		LockeApplication *app = locke_application_get_singleton();
 		locke_application_init(app, baseDir, filename);
@@ -32,7 +33,7 @@ LockeApplicationWrapper *locke_application_wrapper_new(const gchar *baseDir,
 		g_strerror(errno));
 		return NULL;
 	} else { /* parent process */
-		g_print("PID(%d) fork done, application process created - pid=%d\n", getpid(), pid);
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO, "PID(%d) fork done, application process created - pid=%d", getpid(), pid);
 		/* In the parent process, creates the wrapper */
 		LockeApplicationWrapper * result = (LockeApplicationWrapper *) calloc(1,
 				sizeof(LockeApplicationWrapper));
@@ -42,12 +43,12 @@ LockeApplicationWrapper *locke_application_wrapper_new(const gchar *baseDir,
 	}
 }
 void locke_application_wrapper_destroy(LockeApplicationWrapper *law) {
-	g_print("PID(%d) Stopping application '%s' with PID(%d) \n", getpid(),
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO, "PID(%d) Stopping application '%s' with PID(%d) ", getpid(),
 			law->appName, law->pid);
 	kill(law->pid, SIGTERM);
 	if (law != NULL)
 		free(law);
-	g_print(" Application stopped \n");
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO, " Application stopped ");
 }
 
 void locke_application_wrapper_set_pid(LockeApplicationWrapper *ls, pid_t pid) {

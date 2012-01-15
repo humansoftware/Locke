@@ -20,12 +20,13 @@
 #include <glib-object.h>
 #include <signal.h>
 #include <unistd.h>
+#include <locke_log.h>
 
 gboolean timeout_callback(gpointer data) {
 	static int i = 0;
 
 	i++;
-	g_print("timeout_callback called %d/10 times\n", i);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_DEBUG, "timeout_callback called %d/10 times", i);
 	if (10 == i) {
 		g_main_loop_quit((GMainLoop*) data);
 		return FALSE;
@@ -36,7 +37,7 @@ gboolean timeout_callback(gpointer data) {
 
 static void signals_handler(int signum) {
 	/* Any received signal will terminate the server */
-	printf("PID (%d) Received signal [%d]!", getpid(), signum);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_CRITICAL, "PID (%d) Received signal [%d]!", getpid(), signum);
 	switch (signum) {
 	case SIGSEGV:
 		/* segmentation fault - finishes server
@@ -45,7 +46,7 @@ static void signals_handler(int signum) {
 		kill(getpid(), signum);
 		break;
 	default:
-		printf("Finishing server\n");
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_CRITICAL, "Finishing server");
 		locke_system_quit_mainloop(locke_system_get_singleton());
 		break;
 	}
@@ -59,16 +60,16 @@ int main(int argc, char *argv[]) {
 	signal(SIGTERM, signals_handler);
 	signal(SIGSEGV, signals_handler);
 
-	g_print(
-			"============================================================================\n");
-	g_print("Locke server v%d.%d\n", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
-	g_print(
-			"============================================================================\n");
-	g_print("Starting glib backend\n");
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO,
+			"============================================================================");
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO, "Locke server v%d.%d", LOCKE_MAJOR_VERSION, LOCKE_MINOR_VERSION);
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_INFO,
+			"============================================================================");
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_DEBUG, "Starting glib backend");
 	/* Initialize GLib type system */
 	g_type_init();
 
-	g_print("Creating main loop\n");
+	g_log(LSVR_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating main loop");
 	/* Init system */
 	LockeSystem *system = locke_system_init_singleton(argc, argv);
 	locke_system_set_serverpid(system, getpid());
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
 	locke_appmanager_init(appmanager, deployFolder, &err);
 	if (err != NULL) {
 		/* Report error to user, and free error */
-		fprintf(stderr, "Unable to Init application manager: %s\n",
+		g_log(LSVR_DOMAIN, G_LOG_LEVEL_ERROR, "Unable to Init application manager: %s",
 				err->message);
 		g_error_free(err);
 		goto locke_main_finally;

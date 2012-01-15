@@ -24,6 +24,7 @@ The binary distro contains the following folder structure:
 - / = The root folder of the distro. You can set the LOCKE_HOME environment variable to set this folder manually
 - /api = folder that contains API header files you should include when creating your application
 - /autodeploy = deploy folder. Just copy your application to this folder and Locke will automatically load it.
+- /plugins = folder where service plugins are deployed to. Service plugins are DLL files that register a new service kind to be supported by the server.
 - /config = general configuration files. Contains config which is not application specific.
 - /documentation = server detailed docs
 - /log = log files generated when you run the application 
@@ -37,10 +38,24 @@ Application folder structure
 A valid Locke application should follow this rules:
 - it should be a folder that contains a .cfg file and a .so/.dll file
 - the name of the .cfg file, the .so file and the folder's name should all be the same.
+- Just put the app folder in the server autodeploy dir and the deploy will be made. If you `touch autodeploy/appfolder` when the server is running, a hot re-deploy is performed. 
 
 --------------------------
 Creating your first application 
 --------------------------
+Just look at the sample_apps folder to see how they were done. 
+Basically, these are the rules your app should follow: 
+- You need to generate a library file. Your app is not a standalone executable.
+- You should include header files located in the api folder
+- You don't need to link your library against any other. Just including the header files is fine.
+- Your application should have exactly the same methods (same name and prototype) the sample apps have. Locke find the right methods by their name.
+
+--------------------------
+Getting more help 
+--------------------------
+Subscribe to our mailing list to ask for additional questions. Feel free to ask for new features too. :D
+Subscribe at: http://groups.google.com/group/locker-server 
+
 
 
 
