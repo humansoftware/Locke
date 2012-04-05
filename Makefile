@@ -1,5 +1,7 @@
 PACKAGE_NAME=locke.tgz
 
+default: dist
+
 all:
 	cd server && make all
 	cd sample_apps && make all
