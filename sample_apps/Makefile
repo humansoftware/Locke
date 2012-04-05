@@ -1,13 +1,13 @@
 include ../common.makefile
 
 all:
-	cd demo001 && make all
-	cd demo002 && make all
+	cd demo_socket && make all
+	cd demo_http && make all
 
 dist:
 	cp demo*/*.$(DLL_SUFFIX) ../dist/autodeploy	
 
 clean:
-	cd demo001 && make clean	
-	cd demo002 && make clean
+	cd demo_socket && make clean	
+	cd demo_http && make clean
 	
