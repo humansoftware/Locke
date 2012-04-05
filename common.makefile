@@ -1,4 +1,3 @@
-
 ifeq "$(PLATFORM)" ""
 PLATFORM := $(shell uname | cut -d_ -f1)
 endif
@@ -15,7 +14,7 @@ else
 DLL_SUFFIX=so
 endif
 
-CC=colorgcc
+CC=gcc
 
 GLIB_FLAGS=$$(pkg-config --cflags glib-2.0) 
 GIO_FLAGS=$$(pkg-config --cflags gio-2.0)
